@@ -1,0 +1,24 @@
+{
+    "arnoldPalmer": {
+        "drink_name": "arnoldPalmer",
+        "liquids": {
+            "lemonade": 150,
+            "sweetTea": 150
+        },
+        "ice": true
+    },
+    "lemonade": {
+        "drink_name": "lemonade",
+        "liquids": {
+            "lemonade": 300
+        },
+        "ice": true
+    },
+    "sweetTea": {
+        "drink_name": "sweetTea",
+        "liquids": {
+            "sweetTea": 300
+        },
+        "ice": true
+    }
+}
