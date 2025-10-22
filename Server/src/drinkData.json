@@ -1,5 +1,5 @@
 {
-    "arnoldpalmer": {
+    "arnoldPalmer": {
         "drink_name": "arnoldPalmer",
         "liquids": {
             "lemonade": 150,
@@ -14,7 +14,7 @@
         },
         "ice": true
     },
-    "sweettea": {
+    "sweetTea": {
         "drink_name": "sweetTea",
         "liquids": {
             "sweetTea": 300

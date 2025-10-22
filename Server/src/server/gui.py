@@ -1,6 +1,6 @@
 import sys
 from time import sleep as wait
-from .globals import serverVar
+from .serverDatabase import Queue
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -96,6 +96,7 @@ class CustomDrinkPage(QWidget):
         if len(selected) > 3:
             self.label = QLabel("Please select at most 3 drinks")
         else:
+            Queue.addToQueue("Test")
             self.submitSelected.emit(selected)
 
 class MakingDrinkPage(QWidget):

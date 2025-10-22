@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -21,13 +22,14 @@ class drinkDatabase:
         if isinstance(drinkName, bytes):
             drinkName = drinkName.decode("utf-8")
 
-        drinkName = drinkName.lower()
+        print(drinkName)
+        print(type(drinkName))
 
-        drinkData = data.get(drinkName)
-        if (drinkData != None):
+        try:
+            drinkData = data.get(drinkName)
             return drinkData
-        else:
-            return 0
+        except:
+            logger.error(f"Requested drink does not exist")
     
 class simpleDrinks:
     def initializeSimpleDrinks():
@@ -54,14 +56,11 @@ class simpleDrinks:
         }
 
         data["lemonade"] = lemonadeDrink
-        data["sweettea"] = sweetTeaDrink
+        data["sweetTea"] = sweetTeaDrink
 
         # Save data back to JSON file
         with open('drinkData.json', 'w') as file:
             json.dump(data, file, indent=4)
-
-    def createSimpleDrink():
-        pass
 
 class mixedDrinks:
     def initializeMixedDrinks():
@@ -80,11 +79,60 @@ class mixedDrinks:
             "ice": True,
         }
 
-        data["arnoldpalmer"] = arnoldPalmerDrink
+        # Store booking data
+        data["arnoldPalmer"] = arnoldPalmerDrink
 
         # Save data back to JSON file
         with open('drinkData.json', 'w') as file:
             json.dump(data, file, indent=4)
 
-    def createMixedDrink():
-        pass
+class Queue:
+    FILE = "queue.json"
+
+    @staticmethod
+    def addToQueue(drinkData):
+        """Append a new drink to the queue list."""
+        if not os.path.exists(Queue.FILE):
+            data = []
+        else:
+            with open(Queue.FILE, "r") as f:
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    data = []
+
+        arnoldPalmerDrink = {
+            "drink_name": "arnoldPalmer",
+            "liquids": {
+                "lemonade": 150,
+                "sweetTea": 150,
+            },
+            "ice": True,
+        }
+
+        data.append(arnoldPalmerDrink)
+
+        with open(Queue.FILE, "w") as f:
+            json.dump(data, f, indent=4)
+
+    @staticmethod
+    def getQueue():
+        """Return and remove the first item from the queue."""
+        if not os.path.exists(Queue.FILE):
+            return None
+
+        with open(Queue.FILE, "r") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                return None
+
+        if not data: 
+            return None
+
+        next_item = data.pop(0) 
+
+        with open(Queue.FILE, "w") as f:
+            json.dump(data, f, indent=4)
+
+        return next_item

@@ -4,8 +4,9 @@ import os
 import selectors
 import socket
 import sys
+import time
+import threading
 from .serverDatabase import *
-from .globals import serverVar
 
 BUFFER_SIZE = 2**12
 ENCODING = "UTF-8"
@@ -43,7 +44,6 @@ class ClientHandler:
                 while data := self.peer_socket.recv(BUFFER_SIZE).strip():
                     logger.info(f"Received from client {self._peer_address}: {data}")
                     retrievedDrink = drinkDatabase.retrieveDrink(data)
-                    print(retrievedDrink)
                     if (retrievedDrink != 0):
                         jsonString = json.dumps(retrievedDrink)
                         self.peer_socket.send(jsonString.encode(ENCODING))
@@ -59,14 +59,25 @@ class ClientHandler:
 
             logger.info(f"Disconnected from {self._peer_address}")
 
-    def sendCustomDrink(self, customDrink):
-        self.peer_socket.send("Test".encode(ENCODING))
+class QueueHandler:
+    def __init__(self, peer_socket, peer_address):
+        self.peer_socket = peer_socket
+        self._peer_address = peer_address
+
+    def run(self):
+        while True:
+            logger.error("Test")
+            queuedItem = Queue.getQueue()
+            logger.info(queuedItem)
+            if queuedItem:
+                self.peer_socket.send(json.dumps(queuedItem).encode(ENCODING))
+                logger.info(f"Sent queued item to {self._peer_address}")
+            time.sleep(5)
         
 class Server:
     def __init__(self, port):
         self.port = port
         self.server_socket = None
-        self.clientHandler = None
 
     def _openListener(self):
         try:
@@ -80,10 +91,6 @@ class Server:
             raise SystemExit(1)
 
         logger.info(f"Listening on port {self.port}")
-        
-    def sendCustomDrink(self, customDrink):
-        handler = self.clientHandler
-        handler.sendCustomDrink(customDrink)
 
     def run(self):
         self._openListener()
@@ -92,8 +99,12 @@ class Server:
                 peer_socket, peer_address = self.server_socket.accept()
                 
                 handler = ClientHandler(peer_socket, peer_address)
-                handler.run()
-                self.clientHandler = handler
+                queueHandler = QueueHandler(peer_socket, peer_address)
+                clientThread = threading.Thread(target=handler.run, daemon=True)
+                queueThread = threading.Thread(target=queueHandler.run, daemon=True)
+
+                clientThread.start()
+                queueThread.start()
         
         except KeyboardInterrupt:
             logger.info("Shutting down\r\n")   
@@ -103,5 +114,5 @@ def serverMain():
     initLogging()
     initDatabase()
     args = parseCLI()
-    serverVar = Server(args.port)
-    serverVar.run()
+    server = Server(args.port)
+    server.run()
