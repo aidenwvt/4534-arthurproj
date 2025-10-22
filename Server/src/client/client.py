@@ -16,6 +16,7 @@ ENCODING = "UTF-8"
 def parse_cli():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", type=str, default=SERVER_IP, help="Address to use, by default uses docker internal")
+    parser.add_argument("-p", type=int, default=PORT, help="Port to use, by default uses 10005")
     return parser.parse_args()
 
 def receive_messages(client_socket):
@@ -66,4 +67,5 @@ def test_client():
 if __name__ == "__main__":
     args = parse_cli()
     SERVER_IP = args.i
+    PORT = args.p
     test_client()

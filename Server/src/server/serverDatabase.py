@@ -21,14 +21,13 @@ class drinkDatabase:
         if isinstance(drinkName, bytes):
             drinkName = drinkName.decode("utf-8")
 
-        print(drinkName)
-        print(type(drinkName))
+        drinkName = drinkName.lower()
 
-        try:
-            drinkData = data.get(drinkName)
+        drinkData = data.get(drinkName)
+        if (drinkData != None):
             return drinkData
-        except:
-            logger.error(f"Requested drink does not exist")
+        else:
+            return 0
     
 class simpleDrinks:
     def initializeSimpleDrinks():
@@ -55,11 +54,14 @@ class simpleDrinks:
         }
 
         data["lemonade"] = lemonadeDrink
-        data["sweetTea"] = sweetTeaDrink
+        data["sweettea"] = sweetTeaDrink
 
         # Save data back to JSON file
         with open('drinkData.json', 'w') as file:
             json.dump(data, file, indent=4)
+
+    def createSimpleDrink():
+        pass
 
 class mixedDrinks:
     def initializeMixedDrinks():
@@ -78,9 +80,11 @@ class mixedDrinks:
             "ice": True,
         }
 
-        # Store booking data
-        data["arnoldPalmer"] = arnoldPalmerDrink
+        data["arnoldpalmer"] = arnoldPalmerDrink
 
         # Save data back to JSON file
         with open('drinkData.json', 'w') as file:
             json.dump(data, file, indent=4)
+
+    def createMixedDrink():
+        pass
