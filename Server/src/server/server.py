@@ -66,13 +66,11 @@ class QueueHandler:
 
     def run(self):
         while True:
-            logger.error("Test")
             queuedItem = Queue.getQueue()
-            logger.info(queuedItem)
             if queuedItem:
                 self.peer_socket.send(json.dumps(queuedItem).encode(ENCODING))
                 logger.info(f"Sent queued item to {self._peer_address}")
-            time.sleep(5)
+            time.sleep(3)
         
 class Server:
     def __init__(self, port):

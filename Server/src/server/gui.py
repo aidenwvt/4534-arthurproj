@@ -78,12 +78,22 @@ class CustomDrinkPage(QWidget):
         super().__init__()
         layout = QVBoxLayout()
         self.drink_buttons = []
+        
+        btn = QCheckBox(f"Lemonade")
+        self.drink_buttons.append(btn)
+        layout.addWidget(btn)
 
-        # create 8 selectable options
-        for i in range(8):
-            btn = QCheckBox(f"Option {i+1}")
-            self.drink_buttons.append(btn)
-            layout.addWidget(btn)
+        btn = QCheckBox(f"Sweet Tea")
+        self.drink_buttons.append(btn)
+        layout.addWidget(btn)
+
+        btn = QCheckBox(f"Water")
+        self.drink_buttons.append(btn)
+        layout.addWidget(btn)
+
+        btn = QCheckBox(f"Black Coffee")
+        self.drink_buttons.append(btn)
+        layout.addWidget(btn)
 
         submit_btn = QPushButton("Submit")
         submit_btn.clicked.connect(self.handle_submit)
@@ -96,7 +106,7 @@ class CustomDrinkPage(QWidget):
         if len(selected) > 3:
             self.label = QLabel("Please select at most 3 drinks")
         else:
-            Queue.addToQueue("Test")
+            Queue.addToQueue(selected)
             self.submitSelected.emit(selected)
 
 class MakingDrinkPage(QWidget):

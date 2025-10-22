@@ -22,9 +22,6 @@ class drinkDatabase:
         if isinstance(drinkName, bytes):
             drinkName = drinkName.decode("utf-8")
 
-        print(drinkName)
-        print(type(drinkName))
-
         try:
             drinkData = data.get(drinkName)
             return drinkData
@@ -101,16 +98,17 @@ class Queue:
                 except json.JSONDecodeError:
                     data = []
 
-        arnoldPalmerDrink = {
-            "drink_name": "arnoldPalmer",
-            "liquids": {
-                "lemonade": 150,
-                "sweetTea": 150,
-            },
-            "ice": True,
+        drinkData = drinkData[:3]
+
+        liquids = {liquid: 150 for liquid in drinkData}
+        customDrink = {
+            "drink_name": "customDrink",
+            "liquids": liquids,
+            "ice": True
         }
 
-        data.append(arnoldPalmerDrink)
+        # Append to queue
+        data.append(customDrink)
 
         with open(Queue.FILE, "w") as f:
             json.dump(data, f, indent=4)
