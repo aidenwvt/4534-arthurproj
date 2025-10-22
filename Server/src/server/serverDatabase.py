@@ -22,6 +22,9 @@ class drinkDatabase:
         if isinstance(drinkName, bytes):
             drinkName = drinkName.decode("utf-8")
 
+        drinkName = drinkName.replace(" ", "")
+        drinkName = drinkName.lower()
+
         try:
             drinkData = data.get(drinkName)
             return drinkData
@@ -53,7 +56,7 @@ class simpleDrinks:
         }
 
         data["lemonade"] = lemonadeDrink
-        data["sweetTea"] = sweetTeaDrink
+        data["sweettea"] = sweetTeaDrink
 
         # Save data back to JSON file
         with open('drinkData.json', 'w') as file:
@@ -77,7 +80,7 @@ class mixedDrinks:
         }
 
         # Store booking data
-        data["arnoldPalmer"] = arnoldPalmerDrink
+        data["arnoldpalmer"] = arnoldPalmerDrink
 
         # Save data back to JSON file
         with open('drinkData.json', 'w') as file:
@@ -109,6 +112,24 @@ class Queue:
 
         # Append to queue
         data.append(customDrink)
+
+        with open(Queue.FILE, "w") as f:
+            json.dump(data, f, indent=4)
+
+    @staticmethod
+    def addToQueueClient(drinkData):
+        """Append a new drink to the queue list."""
+        if not os.path.exists(Queue.FILE):
+            data = []
+        else:
+            with open(Queue.FILE, "r") as f:
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    data = []
+
+        # Append to queue
+        data.append(drinkData)
 
         with open(Queue.FILE, "w") as f:
             json.dump(data, f, indent=4)

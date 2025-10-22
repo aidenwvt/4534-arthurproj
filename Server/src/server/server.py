@@ -45,8 +45,7 @@ class ClientHandler:
                     logger.info(f"Received from client {self._peer_address}: {data}")
                     retrievedDrink = drinkDatabase.retrieveDrink(data)
                     if (retrievedDrink != 0):
-                        jsonString = json.dumps(retrievedDrink)
-                        self.peer_socket.send(jsonString.encode(ENCODING))
+                        Queue.addToQueueClient(retrievedDrink)
                     else:
                         self.peer_socket.send("Drink not found".encode(ENCODING))
 
