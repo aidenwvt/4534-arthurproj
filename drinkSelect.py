@@ -1,20 +1,6 @@
 import sys
 from time import sleep as wait
 from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget
-# app = QApplication(sys.argv)
-# window = QWidget()
-# window.setWindowTitle("Arthur")
-# layout = QVBoxLayout()
-# label = QLabel("Welcome! Please select your drink.")
-# layout.addWidget(label)
-# button = QPushButton("Close")
-# button.clicked.connect(window.close)
-# layout.addWidget(button)
-# window.setLayout(layout)
-# window.show()
-# sys.exit(app.exec_())
-
-
 # Class for drinks. Each drink has a name, container number, availability status, and amount of mls in container. If a drink runs out or is not in one of the 12 containers,
 # it will be marked as unavailable. The drinks will not be shown to the user.
 class drink:
