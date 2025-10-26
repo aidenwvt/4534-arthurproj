@@ -13,9 +13,10 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QLabel,
     QMessageBox,
+    QSlider,
 )
 
-from PyQt5.QtCore import QTimer, pyqtSignal as signal
+from PyQt5.QtCore import QTimer, Qt, pyqtSignal as signal
 
 # Main Window
 class MainWindow(QMainWindow):
@@ -78,22 +79,33 @@ class CustomDrinkPage(QWidget):
         super().__init__()
         layout = QVBoxLayout()
         self.drink_buttons = []
-        
-        btn = QCheckBox(f"Lemonade")
-        self.drink_buttons.append(btn)
-        layout.addWidget(btn)
+        self.drink_sliders = []
 
-        btn = QCheckBox(f"Sweet Tea")
-        self.drink_buttons.append(btn)
-        layout.addWidget(btn)
+        drinkOptions = ["Lemonade", "Sweet Tea", "Water", "Black Coffee"]
 
-        btn = QCheckBox(f"Water")
-        self.drink_buttons.append(btn)
-        layout.addWidget(btn)
+        # create 8 selectable options
+        for drink in drinkOptions:
+            row = QVBoxLayout()
 
-        btn = QCheckBox(f"Black Coffee")
-        self.drink_buttons.append(btn)
-        layout.addWidget(btn)
+            btn = QCheckBox(drink)    
+            slider = QSlider(Qt.Horizontal)
+            slider.setRange(0, 300)
+            slider.setMinimum(0)
+            slider.setValue(0)
+            slider.setMaximum(300)
+            slider.setTickInterval(50)
+            slider.setTickPosition(QSlider.TicksBelow)
+
+            sliderLabel = QLabel("Amount: 0 ml")
+            slider.valueChanged.connect(lambda value, label=sliderLabel: label.setText(f"Amount: {value} ml"))
+
+            row.addWidget(btn)
+            row.addWidget(slider)
+            row.addWidget(sliderLabel)
+
+            self.drink_buttons.append(btn)
+            self.drink_sliders.append(slider)
+            layout.addLayout(row)
 
         submit_btn = QPushButton("Submit")
         submit_btn.clicked.connect(self.handle_submit)
@@ -103,10 +115,16 @@ class CustomDrinkPage(QWidget):
 
     def handle_submit(self):
         selected = [b.text() for b in self.drink_buttons if b.isChecked()]
+        totalAmount = sum(slider.value() for i, slider in enumerate(self.drink_sliders) if self.drink_buttons[i].isChecked())
         if len(selected) > 3:
-            self.label = QLabel("Please select at most 3 drinks")
+            QMessageBox.warning(self, "Selection Error", "Please select at most 3 drinks")
+            #self.label = QLabel("Please select at most 3 drinks")
+        elif totalAmount > 300:
+            QMessageBox.warning(self, "Amount Error", "Please select a total amount of 300 ml or less")
+            #self.label = QLabel("Please select a total amount of 300 ml or less")
         else:
-            Queue.addToQueue(selected)
+            numberList = [slider.value() for i, slider in enumerate(self.drink_sliders) if self.drink_buttons[i].isChecked()]
+            Queue.addToQueue(selected, numberList)
             self.submitSelected.emit(selected)
 
 class MakingDrinkPage(QWidget):

@@ -90,7 +90,7 @@ class Queue:
     FILE = "queue.json"
 
     @staticmethod
-    def addToQueue(drinkData):
+    def addToQueue(drinkData, drinkAmount):
         """Append a new drink to the queue list."""
         if not os.path.exists(Queue.FILE):
             data = []
@@ -102,8 +102,12 @@ class Queue:
                     data = []
 
         drinkData = drinkData[:3]
+        drinkNum = drinkAmount[:3]
+        liquids = {}
 
-        liquids = {liquid: 150 for liquid in drinkData}
+        for liquid, volume in zip(drinkData, drinkNum):
+            liquids[liquid] = volume
+
         customDrink = {
             "drink_name": "customDrink",
             "liquids": liquids,
