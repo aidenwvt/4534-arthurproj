@@ -1,1 +1,0 @@
-serverVar = None
