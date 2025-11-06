@@ -8,7 +8,7 @@ class drink:
         self.name = name
         self.container = container
         self.available = available
-        self.amount = 1000  # Default amount in ml
+        self.amount = 3550  # Default amount in ml
     
     def setName(self, name):
         self.name = name
