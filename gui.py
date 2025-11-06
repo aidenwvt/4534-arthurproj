@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5.QtCore import QTimer, Qt, pyqtSignal as signal
+from PyQt5.QtGui import QFont
 
 # Main Window
 class MainWindow(QMainWindow):
@@ -121,6 +122,9 @@ class CustomDrinkPage(QWidget):
         layout = QVBoxLayout()
         self.drink_buttons = []
         self.drink_sliders = []
+        checkbox_font = QFont()
+        checkbox_font.setPointSize(16)
+        checkbox_style = "QCheckBox::indicator { width: 30px; height: 30px; }"
 
         # create 8 selectable options
         for d in drinks:
@@ -129,12 +133,16 @@ class CustomDrinkPage(QWidget):
 
             top_row = QHBoxLayout()
             btn = QCheckBox(d.getName())
+            btn.setFont(checkbox_font)
+            btn.setStyleSheet(checkbox_style)
             sliderLabel = QLabel("Amount: 0 ml")
 
             top_row.addWidget(btn)
             top_row.addWidget(sliderLabel)
     
             slider = QSlider(Qt.Horizontal)
+            slider.setFixedHeight(40)
+            slider.setStyleSheet("""QSlider::handle:horizontal {width: 35px; height: 35px;margin: -8px 0;}""")
             slider.setRange(0, 300)
             slider.setMinimum(0)
             slider.setValue(0)
