@@ -120,27 +120,47 @@ class CustomDrinkPage(QWidget):
 
     def __init__(self):
         super().__init__()
-        layout = QVBoxLayout()
+
+        mainLayout = QVBoxLayout()
+        rowLayout = QHBoxLayout()
+        leftColumn = QVBoxLayout()
+        rightColumn = QVBoxLayout()
+
         self.drink_buttons = []
         self.drink_sliders = []
-        checkbox_font = QFont()
-        checkbox_font.setPointSize(16)
-        checkbox_style = "QCheckBox::indicator { width: 30px; height: 30px; }"
 
+        checkbox_font = QFont()
+        checkbox_font.setPointSize(20)
+        checkbox_style = "QCheckBox::indicator { width: 40px; height: 40px; }"
+
+        j = 0
         # create 8 selectable options
         for d in drinks:
-            i = drinks.index(d)
+            col = leftColumn if j < 4 else rightColumn
             row = QVBoxLayout()
 
+            # checkbox
             top_row = QHBoxLayout()
             btn = QCheckBox(d.getName())
             btn.setFont(checkbox_font)
             btn.setStyleSheet(checkbox_style)
+
+            # slider label
             sliderLabel = QLabel("Amount: 0 ml")
+
+            i = drinks.index(d)
+            #row = QVBoxLayout()
+
+            #top_row = QHBoxLayout()
+            #btn = QCheckBox(d.getName())
+            #btn.setFont(checkbox_font)
+            #btn.setStyleSheet(checkbox_style)
+            #sliderLabel = QLabel("Amount: 0 ml")
 
             top_row.addWidget(btn)
             top_row.addWidget(sliderLabel)
     
+            # slider
             slider = QSlider(Qt.Horizontal)
             slider.setFixedHeight(40)
             slider.setMinimum(0)
@@ -156,16 +176,26 @@ class CustomDrinkPage(QWidget):
 
             row.addLayout(top_row)
             row.addWidget(slider)
+            col.addLayout(row)
 
             self.drink_buttons.append(btn)
             self.drink_sliders.append(slider)
-            layout.addLayout(row)
+            #layout.addLayout(row)
+            j += 1
 
+        rowLayout.addLayout(leftColumn)
+        rowLayout.addLayout(rightColumn)
+        rowLayout.setStretch(0, 1)
+        rowLayout.setStretch(1, 1)
+        mainLayout.addLayout(rowLayout)
+        mainLayout.setStretch(0, 1)
         submit_btn = QPushButton("Submit")
         submit_btn.clicked.connect(self.handle_submit)
-        layout.addWidget(submit_btn, alignment=Qt.AlignCenter)
+        mainLayout.addWidget(submit_btn, alignment=Qt.AlignCenter)
+        #layout.addWidget(submit_btn, alignment=Qt.AlignCenter)
 
-        self.setLayout(layout)
+        self.setLayout(mainLayout)
+        #self.setLayout(layout)
 
     def updateSliders(self, value, label, slider):
         value = (value // 10) * 10  # Round to nearest 10
