@@ -1,6 +1,7 @@
 from drinkSelect import drink, mixedDrink
 import sys
 from time import sleep as wait
+from functools import partial
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -142,17 +143,16 @@ class CustomDrinkPage(QWidget):
     
             slider = QSlider(Qt.Horizontal)
             slider.setFixedHeight(40)
-            slider.setStyleSheet("""QSlider::handle:horizontal {width: 35px; height: 35px;margin: -8px 0;}""")
-            slider.setRange(0, 300)
             slider.setMinimum(0)
             slider.setValue(0)
             slider.setMaximum(300)
-            slider.setTickInterval(50)
+            slider.setTickInterval(10)
             slider.setSingleStep(10)
             slider.setTickPosition(QSlider.TicksBelow)
 
             #sliderLabel = QLabel("Amount: 0 ml")
-            slider.valueChanged.connect(lambda value, label=sliderLabel: label.setText(f"Amount: {value} ml"))
+            #slider.valueChanged.connect(lambda value, label=sliderLabel: label.setText(f"Amount: {value} ml"))
+            slider.valueChanged.connect(partial(self.updateSliders, label=sliderLabel, slider=slider))
 
             row.addLayout(top_row)
             row.addWidget(slider)
@@ -166,6 +166,11 @@ class CustomDrinkPage(QWidget):
         layout.addWidget(submit_btn, alignment=Qt.AlignCenter)
 
         self.setLayout(layout)
+
+    def updateSliders(self, value, label, slider):
+        value = (value // 10) * 10  # Round to nearest 10
+        slider.setValue(value)
+        label.setText(f"Amount: {value} ml")
 
     def handle_submit(self):
         selected = [b.text() for b in self.drink_buttons if b.isChecked()]
