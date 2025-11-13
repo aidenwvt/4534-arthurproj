@@ -35,6 +35,7 @@ class MainWindow(QMainWindow):
         self.making_page = MakingDrinkPage()
         self.password_page = PasswordPage()
         self.admin_page = AdminPage()
+        self.ice_page = IcePage()
 
         # Add them to the stack
         self.stack.addWidget(self.main_menu)
@@ -42,14 +43,16 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.making_page)
         self.stack.addWidget(self.password_page)
         self.stack.addWidget(self.admin_page)
+        self.stack.addWidget(self.ice_page)
 
         # Connect signals
-        self.main_menu.drinkSelected.connect(self.start_making_drink)
+        self.main_menu.drinkSelected.connect(self.start_ice_page)
         self.main_menu.customSelected.connect(self.show_custom_page)
         self.main_menu.adminSelected.connect(self.show_password_page)
-        self.custom_page.submitSelected.connect(self.start_making_drink)
+        self.custom_page.submitSelected.connect(self.start_ice_page)
         self.password_page.accessGranted.connect(self.show_admin_page)
         self.password_page.returnToMain.connect(self.show_main_menu)
+        self.ice_page.iceDone.connect(self.start_making_drink)
         self.main_menu.updateDrinkButtons()
 
     def show_main_menu(self):
@@ -57,6 +60,9 @@ class MainWindow(QMainWindow):
 
     def show_custom_page(self):
         self.stack.setCurrentWidget(self.custom_page)
+
+    def start_ice_page(self):
+        self.stack.setCurrentWidget(self.ice_page)
 
     def start_making_drink(self, drink_info=None):
         # Switch to making page and start a 10-second timer.
@@ -149,13 +155,6 @@ class CustomDrinkPage(QWidget):
             sliderLabel = QLabel("Amount: 0 ml")
 
             i = drinks.index(d)
-            #row = QVBoxLayout()
-
-            #top_row = QHBoxLayout()
-            #btn = QCheckBox(d.getName())
-            #btn.setFont(checkbox_font)
-            #btn.setStyleSheet(checkbox_style)
-            #sliderLabel = QLabel("Amount: 0 ml")
 
             top_row.addWidget(btn)
             top_row.addWidget(sliderLabel)
@@ -169,9 +168,6 @@ class CustomDrinkPage(QWidget):
             slider.setTickInterval(10)
             slider.setSingleStep(10)
             slider.setTickPosition(QSlider.TicksBelow)
-
-            #sliderLabel = QLabel("Amount: 0 ml")
-            #slider.valueChanged.connect(lambda value, label=sliderLabel: label.setText(f"Amount: {value} ml"))
             slider.valueChanged.connect(partial(self.updateSliders, label=sliderLabel, slider=slider))
 
             row.addLayout(top_row)
@@ -180,7 +176,6 @@ class CustomDrinkPage(QWidget):
 
             self.drink_buttons.append(btn)
             self.drink_sliders.append(slider)
-            #layout.addLayout(row)
             j += 1
 
         rowLayout.addLayout(leftColumn)
@@ -192,10 +187,8 @@ class CustomDrinkPage(QWidget):
         submit_btn = QPushButton("Submit")
         submit_btn.clicked.connect(self.handle_submit)
         mainLayout.addWidget(submit_btn, alignment=Qt.AlignCenter)
-        #layout.addWidget(submit_btn, alignment=Qt.AlignCenter)
 
         self.setLayout(mainLayout)
-        #self.setLayout(layout)
 
     def updateSliders(self, value, label, slider):
         value = (value // 10) * 10  # Round to nearest 10
@@ -220,6 +213,34 @@ class CustomDrinkPage(QWidget):
         for slider in self.drink_sliders:
             slider.setValue(0)
 
+# Ice Page
+class IcePage(QWidget):
+    iceDone = signal()
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+        self.label = QLabel("Add Ice?")
+        font = self.label.font()
+        font.setPointSize(24)
+        self.label.setFont(font)
+        layout.addWidget(self.label, alignment=Qt.AlignCenter)
+
+        # Yes and No buttons
+        yes_btn = QPushButton("Yes")
+        no_btn = QPushButton("No")
+        yes_btn.clicked.connect(self.iceDone.emit)
+        no_btn.clicked.connect(self.iceDone.emit)
+        btn_layout = QHBoxLayout()
+        btn_layout.addWidget(yes_btn)
+        btn_layout.addWidget(no_btn)
+        btn_layout.setAlignment(Qt.AlignCenter)
+        layout.addLayout(btn_layout)
+
+        self.setLayout(layout)
+
+    #def iceDone(self):
+    #    """Simulate ice addition delay then proceed."""
+    #    QTimer.singleShot(5000, self.proceed)
 
 # Making Drink Page
 class MakingDrinkPage(QWidget):
