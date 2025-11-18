@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import selectors
+import serial
 import socket
 import sys
 import time
@@ -28,6 +29,18 @@ def initDatabase():
     drinkDatabase.clearDatabase()
     mixedDrinks.initializeMixedDrinks()
     simpleDrinks.initializeSimpleDrinks()
+
+def convertDrinkToBytes(drink):
+    bytes = ""
+    drinkDict = {"lemonade": 1, "sweetTea": 2}
+    for liquid_name, volume in drink["liquids"].items():
+        pumpValue = drinkDict[liquid_name]
+        bytes += str(pumpValue)
+        bytes += str(volume)
+    while len(bytes) < 12:
+        bytes += '0'
+    return bytes
+
 
 class ClientHandler:
     def __init__(self, peer_socket, peer_address):
@@ -64,13 +77,36 @@ class QueueHandler:
         self._peer_address = peer_address
 
     def run(self):
+        ser = None
+        try:
+            ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+        except:
+            ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+        time.sleep(0.1)
+        print(f"{ser.port} connected")
+
         while True:
             queuedItem = Queue.getQueue()
-            if queuedItem:
-                self.peer_socket.send(json.dumps(queuedItem).encode(ENCODING))
-                logger.info(f"Sent queued item to {self._peer_address}")
-            time.sleep(3)
-        
+            if queuedItem != None:
+                sendBytes = convertDrinkToBytes(queuedItem)
+                logger.info(f"Calculated bytes {sendBytes}")
+                if queuedItem:
+                    self.peer_socket.send(json.dumps(queuedItem).encode(ENCODING))
+                    if ser.is_open:
+                        try:
+                            ser.write(sendBytes.encode())
+                            time.sleep(0.1)
+                            if ser.in_waiting > 0:
+                                answer = ser.readline().decode().strip()
+                                print(f"Arduino response: {answer}")
+                            ser.flush()
+                        except KeyboardInterrupt:
+                            print("KeyboardInterrupt caught")
+                        finally:
+                            ser.close()
+                    logger.info(f"Sent queued item to {self._peer_address}")
+                time.sleep(3)
+
 class Server:
     def __init__(self, port):
         self.port = port
