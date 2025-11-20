@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-import selectors
 import serial
 import socket
 import sys
@@ -62,7 +61,6 @@ class ClientHandler:
                     else:
                         self.peer_socket.send("Drink not found".encode(ENCODING))
 
-
             except OSError as err:
                 logger.error(f"Error communicating with {self._peer_address}: {err}")
         
@@ -95,15 +93,11 @@ class QueueHandler:
                     if ser.is_open:
                         try:
                             ser.write(sendBytes.encode())
+                            logger.info("Sent bytes")
                             time.sleep(0.1)
-                            if ser.in_waiting > 0:
-                                answer = ser.readline().decode().strip()
-                                print(f"Arduino response: {answer}")
-                            ser.flush()
                         except KeyboardInterrupt:
-                            print("KeyboardInterrupt caught")
-                        finally:
                             ser.close()
+                            logger.info("KeyboardInterrupt caught")
                     logger.info(f"Sent queued item to {self._peer_address}")
                 time.sleep(3)
 
